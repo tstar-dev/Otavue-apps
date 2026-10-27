@@ -9,6 +9,7 @@ Free for Android. No account, no ads.</p>
 
 <p>
   <a href="https://otavue-website.vercel.app/download/android"><img src="https://img.shields.io/badge/Download-Android%20APK-D11F28?style=for-the-badge&logo=android&logoColor=white" alt="Download for Android" /></a>
+  <a href="https://otavue-website.vercel.app/download/android-universal"><img src="https://img.shields.io/badge/Universal-32--bit%20too-1A1A1D?style=for-the-badge&logo=android&logoColor=white" alt="Download the universal APK" /></a>
   <a href="https://github.com/tstar-dev/Otavue-apps/releases"><img src="https://img.shields.io/github/v/release/tstar-dev/Otavue-apps?style=for-the-badge&label=Latest&color=0A0A0B" alt="Latest release" /></a>
   <a href="https://github.com/tstar-dev/Otavue-apps/releases"><img src="https://img.shields.io/github/downloads/tstar-dev/Otavue-apps/total?style=for-the-badge&color=0A0A0B" alt="Downloads" /></a>
 </p>
@@ -33,10 +34,15 @@ attached; there is no source code here.
 | Platform | Status | Get it |
 | --- | --- | --- |
 | **Android** (phones and tablets, Android 7.0+) | Available | [Otavue.apk](https://otavue-website.vercel.app/download/android) |
+| **Android, 32-bit** (older phones, TV boxes) | Available | [Otavue-universal.apk](https://otavue-website.vercel.app/download/android-universal) |
 | **Android TV** | Coming soon | — |
 | **Windows** | Coming soon | — |
 
-The Download link always points at the newest Android build. Older versions
+Take `Otavue.apk` first. If Android refuses to install it, the device is
+32-bit: `Otavue-universal.apk` is the same app built to run on it too, at
+a larger size. Both are the same version and either updates the other.
+
+The Download links always point at the newest Android build. Older versions
 stay on the [releases page](https://github.com/tstar-dev/Otavue-apps/releases).
 
 ### Installing on Android
@@ -84,8 +90,9 @@ See everything on the [features page](https://otavue-website.vercel.app/features
 
 ## Verifying the APK
 
-Every Android release is signed with the same key. To check a download is
-genuine, compare its certificate with this SHA-256 fingerprint:
+Every Android release, universal included, is signed with the same key. To
+check a download is genuine, compare its certificate with this SHA-256
+fingerprint:
 
 ```
 AA:98:8D:EB:60:62:9F:97:FE:86:EB:B8:D8:CF:CF:2E:3A:90:89:A7:B4:46:03:5F:D4:FB:9C:03:70:9F:4C:F9
