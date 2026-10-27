@@ -1,0 +1,54 @@
+name: Post release to Discord
+
+# Posts each published release to #releases on the Otavue Discord, under the
+# name and avatar set on that channel's webhook. Full releases ping
+# @Release Pings; prereleases post without a ping.
+#
+# Needs the DISCORD_RELEASES_WEBHOOK secret: the webhook URL from
+# #releases > Edit Channel > Integrations > Webhooks, without /github on the end.
+#
+# Releases made by Otavue's android-release.yml trigger this because it
+# publishes with a personal token; rebuilds that only re-upload APKs don't.
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+jobs:
+  discord:
+    name: Post to #releases
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to #releases
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
+          RELEASE_PINGS_ROLE: '1564463101829451776'
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "::error::DISCORD_RELEASES_WEBHOOK is not set."
+            exit 1
+          fi
+          # 13705000 is the app's crimson600, #D11F28.
+          jq --arg role "$RELEASE_PINGS_ROLE" '
+            .release as $r
+            | ($r.prerelease | not) as $ping
+            | ($r.name // $r.tag_name) as $title
+            | {
+                allowed_mentions: { roles: (if $ping then [$role] else [] end) },
+                embeds: [{
+                  title: $title,
+                  url: $r.html_url,
+                  color: 13705000,
+                  description: ((($r.body // "") | .[0:3500])
+                    + (if ($r.assets | length) > 0
+                       then "\n\n**Download**\n" + ([$r.assets[] | "[\(.name)](\(.browser_download_url))"] | join(" · "))
+                       else "" end)),
+                  footer: { text: (if $r.prerelease then "Pre-release · \($r.tag_name)" else $r.tag_name end) },
+                  timestamp: $r.published_at
+                }]
+              }
+            | if $ping then .content = "<@&\($role)> \($title) is out!" else . end
+          ' "$GITHUB_EVENT_PATH" > payload.json
+          curl --fail-with-body -sS -H 'Content-Type: application/json' --data @payload.json "$WEBHOOK"
