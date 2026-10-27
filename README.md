@@ -65,11 +65,13 @@ See everything on the [features page](https://otavue-website.vercel.app/features
 
 ## Screenshots
 
+<p align="center"><img src="assets/screenshots/player.webp" width="820" alt="Player" /></p>
+
 <table>
   <tr>
     <td align="center"><img src="assets/screenshots/home.webp" width="200" /><br/><sub>Home</sub></td>
     <td align="center"><img src="assets/screenshots/series-detail.webp" width="200" /><br/><sub>Series</sub></td>
-    <td align="center"><img src="assets/screenshots/player.webp" width="200" /><br/><sub>Player</sub></td>
+    <td align="center"><img src="assets/screenshots/picture-in-picture.webp" width="200" /><br/><sub>Picture-in-picture</sub></td>
     <td align="center"><img src="assets/screenshots/join-watch-party.webp" width="200" /><br/><sub>Watch party</sub></td>
   </tr>
   <tr>
