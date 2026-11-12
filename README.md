@@ -83,17 +83,24 @@ phone, under your Otavue account (**Sign in a TV**).
 
 ## What's inside
 
-- **Watch** — a player built around gestures, subtitles, picture-in-picture
-  and multiple sources per episode.
-- **Read** — manga and light novels next to the anime they come from, with
-  your own font, size and theme.
-- **Watch parties** — invite friends and stay in sync, episode by episode.
-- **Offline** — download episodes, chapters and novels, with a quality cap,
+- **Watch**: a player built around gestures, finer playback speeds, subtitles,
+  picture-in-picture, skip intro and filler, and several servers per episode
+  (if a stream stops, it tries the next one itself).
+- **Read**: manga and light novels next to the anime they come from, with your
+  own font, size and theme.
+- **Watch parties**: invite friends and stay in sync, episode by episode, with
+  chat and reactions.
+- **Offline**: download episodes, chapters and novels, with a quality cap,
   Wi-Fi only mode and resume on failure.
-- **Your list** — AniList and MyAnimeList sync, statuses, favourites, backup
-  and restore.
+- **Your list**: AniList and MyAnimeList sync, statuses, favourites, backup and
+  restore. Continue watching follows you between your phone and your TV.
+- **Rankings and Sparks**: an optional Otavue account turns watching into ranks,
+  weekly rankings and Sparks to spend in the shop on frames, banners and more.
+- **On the big screen**: send an episode from your phone to Otavue TV, or use
+  Otavue TV Phoneless with just the remote.
 
-See everything on the [features page](https://otavue-website.vercel.app/features).
+See everything on the [features page](https://otavue-website.vercel.app/features),
+and what changed in each version on [What's new](https://otavue-website.vercel.app/whats-new).
 
 ## Screenshots
 
