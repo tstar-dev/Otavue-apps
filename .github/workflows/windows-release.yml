@@ -1,0 +1,156 @@
+name: Windows release
+
+# Builds Otavue for Windows from the private source and publishes the installers here, where
+# everyone downloads them. Runs here because Actions is free on a public repository.
+#
+# Run it by hand: Actions > Windows release > Run workflow. Only the repository's owner can.
+# The version must already be the one in client/desktop/package.json at the chosen ref
+# (bumped and tagged in tstar-dev/Otavue first). "Dry run" builds and checks without publishing;
+# its installers are kept for a day as the run's artifact.
+#
+# Nothing from the source is published: only the two installers. The service's update offer and
+# the website's download links are updated from the source repository after this run.
+#
+# Secrets:
+#   OTAVUE_SOURCE_TOKEN  fine-grained token, tstar-dev/Otavue, Contents: read-only
+#   APP_ENV_PRODUCTION   the app's EXPO_PUBLIC_* production settings (what ships inside the app)
+#   TMDB_API_KEY         the title-logo key the app ships with
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (as in client/desktop/package.json), e.g. 0.1.0
+        type: string
+        required: true
+      ref:
+        description: Source ref to build (a tag like desktop-v0.1.0, or main)
+        type: string
+        default: main
+      notes:
+        description: What changed, with | between notes (up to 6)
+        type: string
+        default: ''
+      dry_run:
+        description: Dry run (build and check only, publish nothing)
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and publish
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ inputs.version }}
+      TAG: desktop-v${{ inputs.version }}
+    steps:
+      - name: Check the inputs
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Version must look like 0.1.0"; exit 1; }
+          if [ "${{ inputs.dry_run }}" != true ] && gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::$TAG is already released here."; exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: tstar-dev/Otavue
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.OTAVUE_SOURCE_TOKEN }}
+          path: src
+          persist-credentials: false
+
+      - name: Check the source's version
+        working-directory: src
+        run: |
+          have="$(node scripts/release.mjs current desktop)"
+          [ "$have" = "$VERSION" ] || { echo "::error::client/desktop/package.json is $have at ${{ inputs.ref }}, not $VERSION."; exit 1; }
+          echo "Building Otavue for Windows $VERSION from $(git rev-parse --short HEAD)"
+          echo "SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: src/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: src/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: src
+        run: pnpm install --frozen-lockfile --filter otavue... --filter @otavue/desktop...
+
+      - name: Typecheck and test the shell
+        working-directory: src/client/desktop
+        run: |
+          pnpm typecheck
+          pnpm test
+
+      # What ships inside the app: the live service's address and the title-logo key. Nothing else.
+      - name: Write production env
+        working-directory: src/client/mobile
+        env:
+          APP_ENV: ${{ secrets.APP_ENV_PRODUCTION }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          printf '%s\n' "$APP_ENV" | grep '^EXPO_PUBLIC_' | grep -v '^EXPO_PUBLIC_TMDB_KEY=' > .env.production
+          printf 'EXPO_PUBLIC_TMDB_KEY=%s\n' "$TMDB_API_KEY" >> .env.production
+
+      - name: Build the installers (x64 and arm64)
+        working-directory: src/client/desktop
+        env:
+          # Unsigned for now: no code-signing certificate yet.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          pnpm dist:win
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp dist/Otavue-Setup-x64.exe dist/Otavue-Setup-arm64.exe "$GITHUB_WORKSPACE/out/"
+
+      - name: Verify the installers
+        working-directory: src/client/desktop
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          for exe in "$GITHUB_WORKSPACE"/out/*.exe; do
+            node ../../scripts/release.mjs verify desktop "$VERSION" "$exe"
+          done
+          # The live service and the TMDB key really went into the app; only names are printed.
+          grep -rqF -- "$TMDB_API_KEY" web/_expo || { echo "::error::The build has no TMDB key."; exit 1; }
+          grep -rqF -- '.convex.cloud' web/_expo || { echo "::error::The build has no service address."; exit 1; }
+
+      # About 250 MB, for a dry run only, kept a day.
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.dry_run }}
+        with:
+          name: windows-installers
+          path: out/*.exe
+          if-no-files-found: error
+          retention-days: 1
+
+      # A draft first, made public only once both installers are on it.
+      - name: Publish the release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          body="$(node src/scripts/release.mjs notes "$NOTES" | sed 's/^/- /')"
+          [ -n "$body" ] && body="$body"$'\n\n'
+          body="${body}Built from tstar-dev/Otavue@${SHA::7}. Windows 10 or 11, 64-bit: Otavue-Setup-x64.exe for Intel and AMD PCs, Otavue-Setup-arm64.exe for ARM PCs."
+          gh release create "$TAG" -R "$GITHUB_REPOSITORY" --draft --latest=false --title "Otavue for Windows $VERSION" --notes "$body" out/Otavue-Setup-x64.exe out/Otavue-Setup-arm64.exe
+          gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --draft=false --latest=false
+          echo "Published https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
