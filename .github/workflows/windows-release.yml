@@ -151,6 +151,8 @@ jobs:
           body="$(node src/scripts/release.mjs notes "$NOTES" | sed 's/^/- /')"
           [ -n "$body" ] && body="$body"$'\n\n'
           body="${body}Built from tstar-dev/Otavue@${SHA::7}. Windows 10 or 11, 64-bit: Otavue-Setup-x64.exe for Intel and AMD PCs, Otavue-Setup-arm64.exe for ARM PCs."
+          # The installers aren't code-signed yet: their SHA-256, so a download can be checked.
+          body="$body"$'\n\n'"SHA-256:"$'\n```\n'"$(cd out && sha256sum Otavue-Setup-x64.exe Otavue-Setup-arm64.exe)"$'\n```'
           gh release create "$TAG" -R "$GITHUB_REPOSITORY" --draft --latest=false --title "Otavue for Windows $VERSION" --notes "$body" out/Otavue-Setup-x64.exe out/Otavue-Setup-arm64.exe
           gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --draft=false --latest=false
           echo "Published https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"

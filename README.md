@@ -5,13 +5,14 @@
 <h3>The gateway to every story worth watching.</h3>
 
 <p>Stream anime, read the manga and the light novel, and watch with friends, all in one app.<br/>
-Free for Android and Android TV, with an iPhone beta. No account, no ads.</p>
+Free for Android, Android TV and Windows, with an iPhone beta. No account, no ads.</p>
 
 <p>
   <a href="https://otavue.com/download/android"><img src="https://img.shields.io/badge/Download-Android%20APK-D11F28?style=for-the-badge&logo=android&logoColor=white" alt="Download for Android" /></a>
   <a href="https://otavue.com/download/android-universal"><img src="https://img.shields.io/badge/Universal-32--bit%20too-1A1A1D?style=for-the-badge&logo=android&logoColor=white" alt="Download the universal APK" /></a>
   <a href="https://otavue.com/download/android-tv"><img src="https://img.shields.io/badge/Download-Android%20TV-D11F28?style=for-the-badge&logo=androidtv&logoColor=white" alt="Download Otavue TV" /></a>
   <a href="https://otavue.com/download/android-tv-phoneless"><img src="https://img.shields.io/badge/TV-Phoneless-1A1A1D?style=for-the-badge&logo=androidtv&logoColor=white" alt="Download Otavue TV Phoneless" /></a>
+  <a href="https://otavue.com/download/windows"><img src="https://img.shields.io/badge/Download-Windows-D11F28?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows" /></a>
   <a href="https://otavue.com/get-started#iphone"><img src="https://img.shields.io/badge/iPhone-Beta-1A1A1D?style=for-the-badge&logo=apple&logoColor=white" alt="Otavue for iPhone (beta)" /></a>
   <a href="https://github.com/tstar-dev/Otavue-apps/releases"><img src="https://img.shields.io/github/v/release/tstar-dev/Otavue-apps?style=for-the-badge&label=Latest&color=0A0A0B" alt="Latest release" /></a>
   <a href="https://github.com/tstar-dev/Otavue-apps/releases"><img src="https://img.shields.io/github/downloads/tstar-dev/Otavue-apps/total?style=for-the-badge&color=0A0A0B" alt="Downloads" /></a>
@@ -41,7 +42,8 @@ attached; there is no source code here.
 | **Android TV** (Android TV, Google TV, Fire TV, Android 7.0+) | Available | [Otavue-TV.apk](https://otavue.com/download/android-tv) |
 | **Android TV, phoneless** (same TVs, no phone needed) | Available | [Otavue-TV-Phoneless.apk](https://otavue.com/download/android-tv-phoneless) |
 | **iPhone** (iOS 16.4+, sideloaded) | Beta | [Otavue.ipa](https://otavue.com/get-started#iphone) |
-| **Windows** | Coming soon | Not yet |
+| **Windows** (Windows 10 or 11, 64-bit, Intel or AMD) | Available | [Otavue-Setup-x64.exe](https://otavue.com/download/windows) |
+| **Windows on ARM** (Surface Pro X and other ARM PCs) | Available | [Otavue-Setup-arm64.exe](https://otavue.com/download/windows-arm64) |
 
 Take `Otavue.apk` first. If Android refuses to install it, the device is
 32-bit: `Otavue-universal.apk` is the same app built to run on it too, at
@@ -52,8 +54,8 @@ Otavue on your phone. **Otavue TV Phoneless** works on its own: browse,
 search and watch anime with the TV remote. Both are anime only.
 
 The Download links always point at the newest build of each app. The TV
-apps and the iPhone beta have their own version numbers (`tv-v…`,
-`tv-phoneless-v…` and `ios-v…` releases), and the Downloads badge counts
+apps, Windows and the iPhone beta have their own version numbers (`tv-v…`,
+`tv-phoneless-v…`, `desktop-v…` and `ios-v…` releases), and the Downloads badge counts
 every app. Older versions stay on
 the [releases page](https://github.com/tstar-dev/Otavue-apps/releases).
 
@@ -83,6 +85,18 @@ Otavue TV Phoneless needs no phone. Install `Otavue-TV-Phoneless.apk` the
 same way, open it and start browsing. To bring your library and progress,
 choose **Sign in** on the TV and enter the code it shows in Otavue on your
 phone, under your Otavue account (**Sign in a TV**).
+
+### Installing on Windows
+
+1. Download `Otavue-Setup-x64.exe` (or `Otavue-Setup-arm64.exe` on an ARM PC).
+2. Open it. The installer isn't code-signed yet, so Windows may say it
+   protected your PC: click **More info**, then **Run anyway**.
+3. Otavue installs and opens on its own, with a shortcut on the desktop and in
+   the Start menu.
+
+New versions arrive inside the app: it offers each one, downloads it, checks it
+and installs it over the old one, keeping your library and downloads. Sign in
+with your Otavue account to bring your rankings, Sparks and watch parties.
 
 ### Installing on iPhone (beta)
 
@@ -122,6 +136,8 @@ the old one to keep your library. iOS 16.4 or newer.
   weekly rankings and Sparks to spend in the shop on frames, banners and more.
 - **On the big screen**: send an episode from your phone to Otavue TV, or use
   Otavue TV Phoneless with just the remote.
+- **On your PC**: Otavue for Windows, with keyboard shortcuts (Ctrl+K search),
+  hover cards, a week schedule, downloads and Dark, Light or Automatic themes.
 - **Languages**: dubs in other languages when a show has them, and the app in
   English, Spanish or French. What you get depends on the show and where you
   are: some streams are blocked in some countries or regions.
@@ -165,6 +181,15 @@ Otavue TV, Otavue TV Phoneless
 ```bash
 apksigner verify --print-certs Otavue.apk
 ```
+
+The Windows installers aren't code-signed yet. Each `desktop-v…` release lists
+the SHA-256 of both installers; compare it in PowerShell:
+
+```powershell
+Get-FileHash .\Otavue-Setup-x64.exe -Algorithm SHA256
+```
+
+The app checks every update's SHA-256 itself before installing it.
 
 The iPhone IPA is unsigned: SideStore or App Market signs it on your phone. To
 check it, compare its SHA-256 with the one in its `ios-v…` release notes:
