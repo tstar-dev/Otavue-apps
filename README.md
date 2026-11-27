@@ -149,6 +149,8 @@ and what changed in each version on [What's new](https://otavue.com/whats-new).
 
 <p align="center"><img src="assets/screenshots/player.webp" width="820" alt="Player" /></p>
 
+<p align="center"><img src="assets/screenshots/windows.webp" width="820" alt="Otavue for Windows" /><br/><sub>Otavue for Windows</sub></p>
+
 <table>
   <tr>
     <td align="center"><img src="assets/screenshots/home.webp" width="200" /><br/><sub>Home</sub></td>
